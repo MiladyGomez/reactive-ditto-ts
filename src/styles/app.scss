@@ -1,0 +1,35 @@
+// Packages
+@import '~normalize.css';
+
+// Vars
+@import './fonts';
+@import './vars';
+@import './grid';
+
+// Default
+* { -webkit-font-smoothing: antialiased !important; }
+
+body {
+    background-color: $c1;
+    font-family: $f1;
+    font-size: 16px;
+    line-height: 1.1;
+    margin: 0px;
+    color: $c2;
+}
+
+.container {
+    padding: 0 80px;
+    max-width: 1440px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    @media screen and (max-width: 1024px) {
+        padding: 0 60px;
+    }
+    @media screen and (max-width: 991px) {
+        padding: 0 40px;
+    }
+    @media screen and (max-width: 767px) {
+        padding: 0 25px;
+    }
+}

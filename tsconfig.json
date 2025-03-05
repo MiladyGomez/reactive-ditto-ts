@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "ESNext",
+        "jsx": "react-jsx",
+        "strict": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+            "@utils/*": ["./src/utils/*"],
+            "@interface/*": ["./src/interface/*"],
+            "@ui/*": ["./src/UI/*"],
+            "@components/*": ["./src/components/*"],
+            "@styles/*": ["./src/styles/*"],
+            "@containers/*": ["./src/containers/*"],
+        }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+}
