@@ -26,8 +26,11 @@ module.exports = {
         }
     },
     plugins: [
+        // Expose only the specific env vars the bundle needs.
+        // Never use JSON.stringify(process.env) — that leaks every env variable
+        // (including secrets) into the compiled bundle.
         new webpack.DefinePlugin({
-            "process.env": JSON.stringify(process.env)
+            "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || 'development'),
         })
     ],
     ignoreWarnings: [

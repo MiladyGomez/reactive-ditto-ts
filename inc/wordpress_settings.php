@@ -80,7 +80,7 @@ function ditto_login_styles() { ?>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function(event) {
       let loginImg = document.createElement("img");
-        loginImg.src = "<?= get_template_directory_uri() ?>/src/assets/pipe-code-logo.svg";
+        loginImg.src = "<?= esc_js( get_template_directory_uri() ) ?>/src/assets/pipe-code-logo.svg";
         loginImg.alt = "WordPress login image";
         document.querySelector('#login h1').appendChild(loginImg);
     });
@@ -121,6 +121,21 @@ function ditto_menu_settings() {
   }
 }
 add_action('init', 'ditto_menu_settings');
+
+/**
+ * Security Headers
+ * Set baseline HTTP security headers for every front-end response.
+ * HSTS and CSP should be configured at the server (nginx/apache) level;
+ * these cover what is practical to set from within WordPress.
+ */
+function ditto_security_headers() {
+  if ( is_admin() ) return;
+  header( 'X-Content-Type-Options: nosniff' );
+  header( 'X-Frame-Options: SAMEORIGIN' );
+  header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+  header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
+}
+add_action( 'send_headers', 'ditto_security_headers' );
 
 /**
  * Render a media attachment (image or video) as HTML.

@@ -32,8 +32,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
   <!-- Critical runtime variables — must execute before the JS bundle -->
   <script>
-    window._dittoURI_ = "<?= get_template_directory_uri() ?>";
-    window._dittoURL_ = "<?= get_site_url() ?>";
+    window._dittoURI_ = "<?= esc_js( get_template_directory_uri() ) ?>";
+    window._dittoURL_ = "<?= esc_js( get_site_url() ) ?>";
     window._recaptchaSiteKey_ = "<?= esc_js( function_exists('get_field') ? get_field('recaptcha_site_key', 'options') : '' ) ?>";
   </script>
 

@@ -100,7 +100,7 @@ function page_handler( $request ) {
     $params = $request->get_params();
 
     $page = get_posts([
-        'p'                 => $params['id'],
+        'p'                 => absint( $params['id'] ),
         'post_type'         => 'page',
         'post_status'       => 'publish',
     ]);
@@ -189,9 +189,9 @@ function proxy_submission_handler( $request ) {
 
     $response = wp_remote_post( $url, array(
         'method'      => 'POST',
-        'timeout'     => 45,
-        'redirection' => 5,
-        'httpversion' => '1.0',
+        'timeout'     => 15,   // reduced: 45s allowed slow-POST abuse
+        'redirection' => 0,    // never follow redirects — prevents open redirect via proxy
+        'httpversion' => '1.1',
         'blocking'    => true,
         'headers'     => array(
             'Content-Type' => 'application/json',
