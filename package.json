@@ -15,9 +15,13 @@
   "dependencies": {
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
+    "gsap": "^3.13.0",
+    "moment": "^2.30.1",
     "normalize.css": "^8.0.1",
     "react": "^18.1.0",
+    "react-click-away-listener": "^2.4.0",
     "react-dom": "^18.1.0",
+    "react-player": "^2.16.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.7"

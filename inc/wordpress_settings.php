@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -11,6 +11,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 function ditto_scripts() {
   $appVersion = wp_get_theme()->get( 'Version' );
   wp_enqueue_script( 'app-scripts', get_template_directory_uri() . '/dist/app.bundle.js', array(), $appVersion, true );
+
+  // Pre-load router data so React doesn't need an extra API round-trip on first paint
+  if ( function_exists( 'router_pages_handler' ) ) {
+    $router_data = router_pages_handler();
+    wp_add_inline_script( 'app-scripts', 'window.__ROUTER_DATA__ = ' . wp_json_encode( $router_data ) . ';', 'before' );
+  }
+
+  // Pre-load current page ACF content so Page.tsx skips its initial API call
+  global $post;
+  if ( $post && $post->ID && function_exists( 'get_field' ) ) {
+    $page_components = get_field( 'ditto_components', $post->ID );
+    if ( $page_components ) {
+      $page_data = array(
+        'have_post' => true,
+        'title'     => get_the_title( $post->ID ),
+        'content'   => $page_components,
+      );
+      wp_add_inline_script( 'app-scripts', 'window.__PAGE_DATA__ = ' . wp_json_encode( $page_data ) . ';', 'before' );
+    }
+  }
 
   // Wordpress Front Trash
   wp_dequeue_script( 'contact-form-7');
@@ -58,7 +78,7 @@ function ditto_login_styles() { ?>
     }
   </style>
   <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function(event) { 
+    document.addEventListener("DOMContentLoaded", function(event) {
       let loginImg = document.createElement("img");
         loginImg.src = "<?= get_template_directory_uri() ?>/src/assets/pipe-code-logo.svg";
         loginImg.alt = "WordPress login image";
@@ -92,15 +112,41 @@ function ditto_menu_settings() {
       'capability'    => 'edit_posts',
       'redirect'      =>  true
     ));
-    
+
     acf_add_options_sub_page(array(
-      'page_title' 	=> '404 Error',
-      'menu_title' 	=> '404 Error',
+      'page_title' 	=> 'Footer',
+      'menu_title' 	=> 'Footer',
       'parent_slug'   => 'theme-settings',
     ));
   }
 }
 add_action('init', 'ditto_menu_settings');
 
+/**
+ * Render a media attachment (image or video) as HTML.
+ * Used by SSR PHP templates to mirror the React MediaRender component.
+ */
+function render_media($media) {
+  if (!$media) return '';
+
+  if ($media['mime_type'] === 'video/mp4') {
+    return sprintf(
+      '<video autoplay muted loop playsinline><source src="%s" type="video/mp4"></video>',
+      esc_url($media['url'])
+    );
+  }
+
+  return sprintf('<img src="%s" alt="%s" />', esc_url($media['url']), esc_attr($media['alt'] ?? ''));
+}
+
+/**
+ * ACF Link Field Multilang — tell WPM to translate link title and URL fields.
+ */
+add_filter('wpm_acf_link_config', function() {
+	return array(
+		'title' => array(),
+    'url' => array()
+	);
+});
 
 ?>

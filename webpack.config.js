@@ -55,7 +55,8 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: {
-                                localIdentName: "[name]__[local]___[hash:base64:5]",
+                                // No hash — deterministic names so PHP SSR templates can hardcode them
+                                localIdentName: "[name]__[local]",
                             }
                         }
                     }, 

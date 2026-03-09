@@ -19,11 +19,38 @@ if ( ! defined( 'ABSPATH' ) ) {
   <meta name="description" content="">
   <meta name="author" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <!-- Resource hints — establish connections early to cut latency -->
+  <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="//www.googletagmanager.com">
+  <link rel="preconnect" href="https://www.google-analytics.com">
+  <link rel="dns-prefetch" href="//www.google-analytics.com">
+  <link rel="preconnect" href="https://www.recaptcha.net">
+  <link rel="dns-prefetch" href="//www.recaptcha.net">
+
   <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
   <?php wp_head(); ?>
+
+  <!-- Critical runtime variables — must execute before the JS bundle -->
   <script>
     window._dittoURI_ = "<?= get_template_directory_uri() ?>";
     window._dittoURL_ = "<?= get_site_url() ?>";
+    window._recaptchaSiteKey_ = "<?= esc_js( function_exists('get_field') ? get_field('recaptcha_site_key', 'options') : '' ) ?>";
+  </script>
+
+  <!-- Google Analytics — deferred to after page load so it never blocks rendering -->
+  <script>
+    window.addEventListener('load', function() {
+      var gaId = ''; // TODO: set your GA4 measurement ID (e.g. 'G-XXXXXXXXXX')
+      if (!gaId) return;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', gaId);
+    });
   </script>
 </head>
 

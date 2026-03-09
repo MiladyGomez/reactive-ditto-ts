@@ -3,7 +3,8 @@ interface Route {
     post_name: string,
     post_parent: string,
     post_title: string,
-    post_type: string
+    post_type: string,
+    lang: string
 }
 
 export default interface RouterProps {
