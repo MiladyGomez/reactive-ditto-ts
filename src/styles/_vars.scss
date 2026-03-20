@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "sass:math";
 
 // Fonts
 $f1: 'Share Tech Mono', monospace;
@@ -49,6 +50,13 @@ $breakpoints: (
     @return calc(($size * 100) / $viewportWidth) * 1vw;
 }
 
+// fluid($size) scales from the 1440 design, clamped between 1024 and 1680 breakpoints
+@function fluid($size, $design: 1440, $min-vp: 1024, $max-vp: 1680) {
+    $min: math.div($size * $min-vp, $design) * 1px;
+    $max: math.div($size * $max-vp, $design) * 1px;
+    @return clamp(#{$min}, scaleVW($size, $design), #{$max});
+}
+
 @function LH($lineheight, $fontSize) {
     @return calc($lineheight / $fontSize);
 }
@@ -58,4 +66,11 @@ $breakpoints: (
     height: 100%;
     object-fit: cover;
     object-position: center;
+}
+
+// Only apply hover styles on devices that support true hover (not touch)
+@mixin hover {
+    @media (hover: hover) and (pointer: fine) {
+        @content;
+    }
 }

@@ -1,0 +1,43 @@
+name: Build & Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run prod
+
+      - name: Push dist to production branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Orphan checkout of production branch (creates it if it doesn't exist)
+          git fetch origin production 2>/dev/null || true
+          git checkout -B production
+
+          # Remove dist from .gitignore so it gets committed on this branch
+          sed -i '/^dist\b/d' .gitignore
+
+          git add dist/ .gitignore
+          git commit -m "build: $(date -u '+%Y-%m-%d %H:%M UTC') — $(git rev-parse --short HEAD~1 2>/dev/null || echo 'initial')"
+
+          git push origin production --force

@@ -258,10 +258,13 @@ dist/                      Compiled JS/CSS bundles (never edit manually)
 
 - Components use **SCSS modules** (`*.module.scss`)
 - Global styles in `src/styles/app.scss`
-- `_vars.scss` contains: color tokens, font variables, breakpoints, `scaleVW()`, `media()` mixin, `LH()` function, `image-cover`, `button-link`, `text-rules` mixins
+- `_vars.scss` contains: color tokens, font variables, breakpoints, `scaleVW()`, `fluid()`, `media()` mixin, `LH()` function, `image-cover` mixin, `hover` mixin
 - Viewport scaling: `scaleVW($px, $viewportWidth)` converts pixel sizes to `vw` units at a reference width
+- `fluid($size)` scales from the 1440 design, clamped between 1024–1680px — use for all desktop styles
 - Reference widths: `$desk: 1440`, `$tablet: 768`, `$phone: 414`
 - Breakpoints: `mobile`, `tablet-portrait`, `tablet-landscape`, `desktop`, `big-screen`
+- `@include hover { ... }` — wraps `@media (hover: hover) and (pointer: fine)` — always use for `:hover` styles to prevent stuck states on touch devices
+- `scroll-behavior: smooth` is set on `html` in `app.scss` — all `<a href="#anchor">` links scroll smoothly
 
 ---
 
@@ -285,6 +288,44 @@ dist/                      Compiled JS/CSS bundles (never edit manually)
 | Contact Form 7 | Optional | Form submissions via REST API |
 | Yoast SEO | Optional | Page titles are read from `_yoast_wpseo_title` meta |
 | WPM (WordPress Multilingual) | Optional | `wpm-config.json` controls translation scope |
+
+---
+
+## SSR Fixed Components
+
+Fixed components (Header, Footer, CPT-specific) live in `ssr/fixed/`. `footer.php` orchestrates render order:
+
+```php
+get_template_part('ssr/fixed/Header');
+// conditional CPT components:
+if ( is_singular('projects') ) get_template_part('ssr/fixed/ProjectInfo');
+get_template_part('ssr/dynamicZone');
+if ( is_singular('projects') ) get_template_part('ssr/fixed/ProjectNav');
+get_template_part('ssr/fixed/Footer');
+```
+
+Fixed component SSR rules:
+- Guard CPT-specific templates with `if ( ! is_singular('cpt-slug') ) return;`
+- **Header**: read nav with `wp_get_nav_menu_items($menu_locations['main_menu'])`. For custom link menu items (type `custom`, `object_id = 0`), use `wp_make_link_relative($item->url)` — plain `get_post_field('post_name', 0)` returns empty string causing `path = '/'`.
+- **Footer**: read fields with `get_field('field_name', 'options')`. Skip the newsletter form (no SEO value).
+
+---
+
+## Custom Post Types — Key Patterns
+
+**No-internal-page CPT** (e.g. News, links out to external URLs):
+- Register with `'public' => false, 'publicly_queryable' => false, 'show_ui' => true`
+- Custom REST endpoint returns `{ items: [...], total: N }` for load-more pagination
+
+**With-internal-page CPT** (e.g. Projects):
+- Register with `'public' => true, 'publicly_queryable' => true, 'rewrite' => ['slug' => 'cpt-slug']`
+- Add `'page-attributes'` to `supports` for `menu_order` control
+- Wire routing in 3 places: `router_pages_handler()`, `src/app.tsx`, new detail container
+- Add `has_internal_page` ACF `true_false` field so editors can mark non-linkable items
+- After registration: `wp rewrite flush`
+- Add CPT post type to `location` array in page builder ACF JSON to allow `ditto_components` on CPT posts
+- Use `$post->post_title` (not `get_the_title()`) to avoid HTML entity encoding in REST responses
+- Domain label from URL: `new URL(value).hostname.replace(/^www\./, '')`
 
 ---
 
