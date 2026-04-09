@@ -45,6 +45,7 @@ add_action( 'wp_enqueue_scripts', 'ditto_scripts');
  * Theme support
  * https://developer.wordpress.org/reference/functions/add_theme_support/
  */
+add_theme_support( 'title-tag' );   // lets Yoast SEO (via wp_head) manage <title> — removes deprecated wp_title()
 add_theme_support( 'custom-logo' );
 add_theme_support( 'post-thumbnails' );
 

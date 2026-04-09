@@ -16,9 +16,13 @@ set_query_var('components', $components);
 
 <!-- React render — SSR content is visible for SEO and slow-JS scenarios -->
 <div id="app">
-	<main id="ssr-content">
-		<?php get_template_part('ssr/dynamicZone'); ?>
-	</main>
+	<div id="ssr-content">
+		<?php get_template_part('ssr/fixed/Header'); ?>
+		<main>
+			<?php get_template_part('ssr/dynamicZone'); ?>
+		</main>
+		<?php get_template_part('ssr/fixed/Footer'); ?>
+	</div>
 </div>
 
 <style>

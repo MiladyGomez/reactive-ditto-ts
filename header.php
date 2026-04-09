@@ -15,9 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title><?php wp_title('|', true, 'right'); ?> <?php bloginfo('name'); ?></title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <!-- Title and meta description are injected by Yoast SEO via wp_head() -->
+  <!-- Requires add_theme_support('title-tag') in inc/wordpress_settings.php -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <!-- Resource hints — establish connections early to cut latency -->
   <link rel="preconnect" href="https://www.googletagmanager.com">

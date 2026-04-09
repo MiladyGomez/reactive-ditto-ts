@@ -346,13 +346,16 @@ The theme outputs semantic HTML in `#ssr-content` (opacity 0) for SEO. React mou
 ### File structure
 ```
 ssr/
+├── index.php                — directory listing protection (Silence is golden)
 ├── dynamicZone.php          — loops ditto_components, includes ssr/components/{layout}.php
 ├── components/              — one PHP file per acf_fc_layout (dynamic components)
-│   ├── _example.php
+│   ├── index.php            — directory listing protection
+│   ├── _example.php         — copy this to add a new SSR component
 │   └── ...
 └── fixed/                   — always-present components (Header, Footer) + conditional (CPT pages)
-    ├── Header.php
-    ├── Footer.php
+    ├── index.php            — directory listing protection
+    ├── Header.php           — SSR mirror of React Header; reads WP nav menu natively
+    ├── Footer.php           — SSR mirror of React Footer; reads ACF options natively
     └── ...
 ```
 
@@ -390,6 +393,8 @@ The workflow at `.github/workflows/build.yml` builds on push to `main` and force
 ## Key Conventions
 
 - Page content is stored in an ACF flexible content field named **`ditto_components`** — update this name in `inc/wordpress_settings.php`, `inc/endpoints.php`, and `footer.php` when starting a new project
+- The reCAPTCHA site key global is named **`window._recaptchaSiteKey_`** (set in `header.php`). ACF field name is `recaptcha_site_key` (managed by `inc/recaptcha.php`). When migrating legacy themes that used `_RECAPTCHAKEY_`, update all component references.
+- `add_theme_support('title-tag')` in `inc/wordpress_settings.php` is required for Yoast SEO to control `<title>` via `wp_head()`. Never use the deprecated `wp_title()` in `header.php`.
 - `acf_fc_layout` names in ACF must match keys in the `lazyComponents` map in `src/UI/DynamicZone/DynamicZone.tsx` exactly
 - CSS module class names are deterministic (`[name]__[local]`, no hash) so PHP SSR templates can reference them safely
 - The wildcard route in `src/app.tsx` renders `<Error404 />` by default; swap for `<Navigate to="/" />` on single-page landing sites
